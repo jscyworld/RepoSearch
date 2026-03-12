@@ -58,7 +58,6 @@ struct SearchView: View {
             .sheet(item: $selectedURL) { url in
                 NavigationView {
                     RepoWebView(url: url)
-                        .ignoresSafeArea()
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 ShareLink(item: url)
@@ -67,6 +66,7 @@ struct SearchView: View {
                                 Button("Done") { selectedURL = nil }
                             }
                         }
+                        .toolbarBackground(Color(.systemBackground), for: .navigationBar)
                 }
             }
         }
@@ -118,6 +118,7 @@ struct SearchView: View {
                     ForEach(service.searchResults) { repo in
                         Button(action: { setURL(repo.html_url) }) {
                             RepoSearchCell(repo: repo)
+                                .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                         .onAppear {

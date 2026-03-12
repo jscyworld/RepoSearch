@@ -29,3 +29,10 @@
 
 - Prompt: It seems like repo search result remains when I start typing new keyword after clear the previous keyword using backspace in keyboard. Find what I'm missing and improve the logic.
     - background: 키보드 백스페이스로 키워드를 삭제할 때 이전에 검색한 repo result가 남아있는 버그 수정
+    
+- Prompt: Give a gap between RepoWebView content and toolbar.
+    - background: webview content가 toolbar와 겹치는 현상 수정
+    - issue: 기존 .ignoreSafeArea()에서 bottom만 ignore하도록 권고했지만 홈 swipe 등 제스쳐 사용 등을 고려하여 .ignoreSafeArea 자체를 제거
+
+- Prompt: Improve touch logic in repoView items. Entire cell should be touched, not just content area.
+    - background: repoView에 있는 button의 터치 영역을 cell 전체로 확장
