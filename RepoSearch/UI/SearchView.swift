@@ -14,8 +14,15 @@ struct SearchView: View {
     @EnvironmentObject var service: SearchService
     
     @State var query: String = ""
-    @State var recentKeywords = UserDefaults.standard.stringArray(forKey: "recentKeywords") ?? []
+    @State var recentKeywords: [String: Date] = {
+        guard let data = UserDefaults.standard.data(forKey: "recentKeywords"),
+              let decoded = try? JSONDecoder().decode([String: Date].self, from: data) else {
+            return [:]
+        }
+        return decoded
+    }()
     @State var selectedURL: URL?
+    @FocusState var isSearchFieldFocused: Bool
     
     let maxHistoryCount: Int = 10
     
@@ -28,7 +35,10 @@ struct SearchView: View {
                 searchField
                     .padding(10.0)
                     .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
-                    .padding(.bottom, 24.0)
+                if isSearchFieldFocused && !autoCompleteSuggestions.isEmpty {
+                    autoCompletePanel
+                }
+                Spacer().frame(height: 24.0)
                 if !service.searchResults.isEmpty && !query.isEmpty {
                     repoView
                 }
@@ -67,12 +77,27 @@ struct SearchView: View {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
             TextField("저장소 검색", text: $query, onCommit: fetch)
+                .focused($isSearchFieldFocused)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
             if !query.isEmpty {
                 Button(action: clearQuery) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+    
+    
+    // MARK: - UI (AutoComplete)
+    
+    private var autoCompletePanel: some View {
+        VStack(spacing: 0.0) {
+            ForEach(autoCompleteSuggestions, id: \.keyword) { suggestion in
+                Button(action: { fetch(for: suggestion.keyword) }) {
+                    AutoCompleteCell(suggestion: suggestion)
                 }
                 .buttonStyle(.plain)
             }
@@ -117,7 +142,7 @@ struct SearchView: View {
                 .font(.subheadline)
                 .padding(.bottom, 24.0)
             LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4.0), count: 3), alignment: .leading, spacing: 16.0) {
-                ForEach(recentKeywords, id: \.self) { keyword in
+                ForEach(sortedRecentKeywords, id: \.self) { keyword in
                     Button(action: { fetch(for: keyword) }) {
                         RecentKeywordCell(keyword: keyword, handler: { deleteKeyword(for: keyword) })
                     }

@@ -9,6 +9,21 @@ import SwiftUI
 
 extension SearchView {
     
+    // MARK: - Properties (Computed)
+    
+    var autoCompleteSuggestions: [(keyword: String, date: Date)] {
+        guard !query.isEmpty else { return [] }
+        return recentKeywords
+            .filter { $0.key.localizedCaseInsensitiveContains(query) }
+            .sorted { $0.value > $1.value }
+            .map { (keyword: $0.key, date: $0.value) }
+    }
+    
+    var sortedRecentKeywords: [String] {
+        recentKeywords.sorted { $0.value > $1.value }.map(\.key)
+    }
+    
+    
     // MARK: - Function
     
     func clearQuery() {
@@ -17,7 +32,7 @@ extension SearchView {
     }
     
     func clearHistory() {
-        recentKeywords = []
+        recentKeywords = [:]
         saveHistory()
         clearSearchResult()
     }
@@ -27,12 +42,14 @@ extension SearchView {
     }
     
     func deleteKeyword(for keyword: String) {
-        recentKeywords.removeAll { $0 == keyword }
+        recentKeywords.removeValue(forKey: keyword)
         saveHistory()
     }
     
     func saveHistory() {
-        UserDefaults.standard.set(recentKeywords, forKey: "recentKeywords")
+        if let data = try? JSONEncoder().encode(recentKeywords) {
+            UserDefaults.standard.set(data, forKey: "recentKeywords")
+        }
     }
     
     func setURL(_ urlString: String) {
@@ -48,16 +65,16 @@ extension SearchView {
     // MARK: - Function (API)
     
     func fetch() {
+        isSearchFieldFocused = false
         Task {
             do {
                 try await service.search(for: query)
                 
-                if !recentKeywords.contains(query) {
-                    recentKeywords.insert(query, at: 0)
-                }
+                recentKeywords[query] = Date()
                 
                 if recentKeywords.count > maxHistoryCount {
-                    recentKeywords = Array(recentKeywords.prefix(maxHistoryCount))
+                    let sorted = recentKeywords.sorted { $0.value > $1.value }.prefix(maxHistoryCount)
+                    recentKeywords = Dictionary(uniqueKeysWithValues: sorted.map { ($0.key, $0.value) })
                 }
                 
                 saveHistory()

@@ -20,3 +20,9 @@
 26.03.12
 - Prompt: Add a share button in RepoWebView to share URL externally.
     - background: 내부 WebView에서 외부 브라우저로 링크를 공유할 수 있게 수정
+
+- Prompt: Add an auto-complete feature when user type search keyword. Auto-complete keywords panel should appear under the searchField, and the most recent search date should be displayed in mm.dd format next to keyword in the panel. Use recentKeywords to extract auto-complete keyword.
+    - background: 검색어 자동완성 기능 추가
+
+- Prompt: Make a button separated from autocompletepanel. Parameter for a button should be autoCompleteSuggestions type.
+    - background: 자동완성 panel 코드에 있는 Button의 label 부분을 별도의 cell 파일로 관리하기 위해 분리
