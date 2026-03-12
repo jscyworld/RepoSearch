@@ -9,9 +9,27 @@ import SwiftUI
 
 @main
 struct RepoSearchApp: App {
+    
+    // MARK: - Properties
+    
+    let service: SearchService
+    let client: SearchAPIClient
+    
+    
+    // MARK: - Initializer
+    
+    init() {
+        self.client = .init()
+        self.service = .init(from: client)
+    }
+    
+    
+    // MARK: - App
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SearchView()
+                .environmentObject(service)
         }
     }
 }
