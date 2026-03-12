@@ -52,6 +52,9 @@ struct SearchView: View {
             }
             .padding()
             .navigationTitle("Search")
+            .onChange(of: query) {
+                clearSearchResult()
+            }
             .sheet(item: $selectedURL) { url in
                 NavigationView {
                     RepoWebView(url: url)

@@ -26,3 +26,6 @@
 
 - Prompt: Make a button separated from autocompletepanel. Parameter for a button should be autoCompleteSuggestions type.
     - background: 자동완성 panel 코드에 있는 Button의 label 부분을 별도의 cell 파일로 관리하기 위해 분리
+
+- Prompt: It seems like repo search result remains when I start typing new keyword after clear the previous keyword using backspace in keyboard. Find what I'm missing and improve the logic.
+    - background: 키보드 백스페이스로 키워드를 삭제할 때 이전에 검색한 repo result가 남아있는 버그 수정
